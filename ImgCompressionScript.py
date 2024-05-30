@@ -19,10 +19,19 @@ def open_and_compress( input_path: str, output_path: str, max_size: int = 640 ) 
         img = img.resize( ( new_width, new_height ) )
         img.save( output_path, format = "JPEG" )
 
+successes, failures = ( 0, ) * 2
 for file in listdir( input_folder ):
     name, extension = file.rsplit( '.', 1 )
     if extension in { 'jpg', 'png' }:
         input_path  = input_folder  + file
         output_path = output_folder + name + '.jpg'
-        open_and_compress( input_folder, output_folder )
-
+        try:
+            open_and_compress( input_folder, output_folder )
+        except Exception as error:
+            print( f'Error compressing { file }:\n\t{ '\n\t'.join( str( error ).split( '\n' ) ) }' )
+            failures += 1
+        else:
+            successes += 1
+if   not failures : print( f'Sucessfully compressed all { successes } image files in target directory.' )
+elif not successes: print( f'Failed to compress any of the { failures } image files in target directory.' )
+else              : print( f'Successfully compressed { successes } files, failed to compress { failures } files.' )
